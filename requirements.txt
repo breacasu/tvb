@@ -1,0 +1,21 @@
+# TVB - Transcode Video Batch Requirements
+# Python-Pakete für das tvb-Skript
+
+# Medienanalyse
+pymediainfo>=7.0.1
+
+# Fortschrittsanzeige
+tqdm>=4.65.0
+
+# Web-Requests (für HandBrake-Version-Check)
+requests>=2.31.0
+
+# HTML-Parsing (für HandBrake-Version-Check)
+beautifulsoup4>=4.12.0
+
+# Zusätzliche Abhängigkeiten für beautifulsoup4
+lxml>=4.9.0
+
+# Optional: Für bessere Performance
+# numpy>=1.24.0
+# pandas>=2.0.0

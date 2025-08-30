@@ -1,0 +1,87 @@
+# TVB - Transcode Video Batch Configuration Example
+# Copy this file to tvb-config.ini and adjust the settings to your needs
+
+# Encoding presets for different content types
+# Choose the preset that matches your video content
+
+[tvshow]
+# Example: Hardware H.265 encoding for TV shows
+# Fast encoding, excellent quality, preserves all audio/subtitle tracks
+parameter = --add-audio all --add-subtitle all -x encoder=vt_h265 -x quality=56 -x encoder-preset=quality
+
+[movie]
+# Example: Modern AV1 encoding for movies
+# Best compression efficiency, German/English audio focus
+parameter = --mode av1 --add-audio ger --add-audio eng --add-subtitle all
+
+[custom]
+# Example: Software H.265 encoding for any content
+# Compatible with all systems, includes all tracks
+parameter = --mode hevc --quality 24 --add-audio all --add-subtitle all
+
+[preview]
+# Preview encoding: Creates short clips for testing
+# 30 seconds is usually sufficient for quality assessment
+parameter = --stop-at duration:30
+
+[default]
+# ==========================================
+# GENERAL SETTINGS
+# ==========================================
+
+# Input/Output directories (REQUIRED - adjust to your system)
+inputdir = '/path/to/input/videos'
+outputdir = '/path/to/output/directory'
+
+# CPU Usage Control (optional)
+cpulimit = no                    # Enable CPU limiting? (yes/no)
+cpulimitpercent = 400           # CPU usage limit (100 per core, e.g. 400 = 4 cores)
+
+# Language & Localization
+localization = 'en_US'           # Locale for date format in CSV statistics
+                                 # Examples: 'en_US', 'de_DE', 'fr_FR', 'es_ES', 'nl_NL', 'default'
+                                 # Uses system default if locale is not available
+
+# Subtitle Processing
+edit_subtitles_manually = no     # Manual subtitle editing (usually automatic)
+
+# File Handling
+preserve_file_date = no         # Do not keep original file timestamps
+
+# ==========================================
+# ADVANCED FEATURES
+# ==========================================
+
+# Dolby Atmos Support (optional)
+preserve_atmos_audio = no        # Detect and preserve Dolby Atmos tracks
+
+# ==========================================
+# TOOL PATHS (usually not needed)
+# ==========================================
+# The script automatically finds tools in your PATH
+# Only configure these if automatic detection fails
+
+[transcode_video_path]
+# Ruby script for video transcoding (usually found automatically)
+macos = '/usr/local/bin/transcode-video.rb'
+windows = "C:\\Ruby\\bin\\transcode-video.bat"
+
+[mkvpropedit_path]
+# MKV metadata editor (part of MKVToolNix)
+macos = '/usr/local/bin/mkvpropedit'
+windows = "C:\\Program Files\\MKVToolNix\\mkvpropedit.exe"
+
+[mkvmerge_path]
+# MKV multiplexer (part of MKVToolNix)
+macos = '/usr/local/bin/mkvmerge'
+windows = "C:\\Program Files\\MKVToolNix\\mkvmerge.exe"
+
+[ffmpeg_path]
+# FFmpeg for media analysis
+macos = '/usr/local/bin/ffmpeg'
+windows = "C:\\ffmpeg\\bin\\ffmpeg.exe"
+
+[handbrakecli_path]
+# HandBrake command line encoder
+macos = '/usr/local/bin/HandBrakeCLI'
+windows = "C:\\Program Files\\HandBrake\\HandBrakeCLI.exe"
