@@ -1,0 +1,30 @@
+.config-editor {
+  padding: 20px;
+}
+
+.config-editor h2 {
+  margin-bottom: 15px;
+}
+
+.config-editor textarea {
+  width: 100%;
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.config-editor button {
+  margin-top: 10px;
+  padding: 10px 20px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.config-editor button:disabled {
+  background: #ccc;
+}

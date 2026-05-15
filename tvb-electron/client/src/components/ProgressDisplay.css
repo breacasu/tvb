@@ -1,0 +1,56 @@
+.progress-display {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.progress-display h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.batch-progress, .file-progress {
+  margin-bottom: 15px;
+}
+
+.batch-progress label, .file-progress label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: 500;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 30px;
+  background: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  background: #007bff;
+  transition: width 0.3s ease;
+}
+
+.file-progress-fill {
+  background: #28a745;
+}
+
+.progress-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: 500;
+  color: #333;
+}
+
+.file-counter {
+  display: block;
+  margin-top: 5px;
+  font-size: 14px;
+  color: #666;
+}

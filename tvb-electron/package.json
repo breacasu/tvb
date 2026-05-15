@@ -1,0 +1,56 @@
+{
+  "name": "tvb-electron",
+  "version": "1.0.0",
+  "description": "TVB - Transcode Video Batch Electron App",
+  "main": "electron/main-simple.js",
+  "scripts": {
+    "start": "electron .",
+    "build:mac": "electron-builder --mac",
+    "build:win": "electron-builder --win",
+    "build:linux": "electron-builder --linux",
+    "build:all": "electron-builder -mwl"
+  },
+  "keywords": [
+    "video",
+    "transcoding",
+    "batch",
+    "handbrake"
+  ],
+  "author": "breacasu <breacasu@posteo.de>",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.3.3",
+    "electron-builder": "^24.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1"
+  },
+  "dependencies": {
+    "electron-is-dev": "^2.0.0"
+  },
+  "build": {
+    "appId": "tvb.transcode.video.batch",
+    "productName": "TVB",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "src/**/*",
+      "python/**/*",
+      "!**/node_modules/**/*",
+      "!**/.git/**/*",
+      "!**/.kilo/**/*"
+    ],
+    "mac": {
+      "category": "public.app-category.video",
+      "icon": "assets/icon.icns"
+    },
+    "win": {
+      "icon": "assets/icon.ico"
+    },
+    "linux": {
+      "icon": "assets/icon.png"
+    }
+  }
+}

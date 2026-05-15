@@ -1,0 +1,130 @@
+.log-viewer {
+  padding: 20px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.log-viewer h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.log-controls {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.log-controls button {
+  padding: 5px 10px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.log-entries {
+  height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f8f9fa;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.log-entry {
+  padding: 5px 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  gap: 10px;
+}
+
+.log-entry.error { background: #f8d7da; }
+.log-entry.warning { background: #fff3cd; }
+.log-entry.info { background: #d1ecf1; }
+.log-entry.debug { background: #e2e3e5; }
+
+.timestamp {
+  color: #666;
+  min-width: 140px;
+}
+
+.level {
+  font-weight: 600;
+  min-width: 60px;
+}
+
+.level.error { color: #dc3545; }
+.level.warning { color: #ffc107; }
+.level.info { color: #17a2b8; }
+.level.debug { color: #6c757d; }
+
+.message {
+  flex: 1;
+}
+
+.log-viewer h3 {
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.log-controls {
+  margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.log-controls button {
+  padding: 5px 10px;
+  background: #6c757d;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.log-entries {
+  height: 300px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background: #f8f9fa;
+  font-family: 'Courier New', monospace;
+  font-size: 13px;
+}
+
+.log-entry {
+  padding: 5px 10px;
+  border-bottom: 1px solid #eee;
+  display: flex;
+  gap: 10px;
+}
+
+.log-entry.error { background: #f8d7da; }
+.log-entry.warning { background: #fff3cd; }
+.log-entry.info { background: #d1ecf1; }
+.log-entry.debug { background: #e2e3e5; }
+
+.timestamp {
+  color: #666;
+  min-width: 140px;
+}
+
+.level {
+  font-weight: 600;
+  min-width: 60px;
+}
+
+.level.error { color: #dc3545; }
+.level.warning { color: #ffc107; }
+.level.info { color: #17a2b8; }
+.level.debug { color: #6c757d; }
+
+.message {
+  flex: 1;
+}
