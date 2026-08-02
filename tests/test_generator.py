@@ -39,6 +39,29 @@ class TestGeneratorVideoOptions(unittest.TestCase):
         self.assertIn('--quality', opts)
         self.assertIn('24', opts)
 
+    def test_empty_parameters_use_lisa_defaults(self):
+        """An empty preset uses Lisa's default H.264/audio/subtitle behavior."""
+        audio = [{'index': 1, 'codec_name': 'aac', 'channels': 2,
+                  'tags': {'language': 'eng'}}]
+        subtitles = [{'codec_name': 'subrip',
+                      'disposition': {'forced': 1},
+                      'tags': {'language': 'eng'}}]
+        analyzer = MockAnalyzer(
+            {'width': 1920, 'height': 1080, 'codec_name': 'h264',
+             'avg_frame_rate': '24000/1001'},
+            audio_streams=audio,
+            subtitle_streams=subtitles,
+        )
+        generator = HandBrakeGenerator(media_analyzer=analyzer)
+        generator.parse_transcode_video_params('')
+        command = ' '.join(generator.generate_command_list('input.mkv', 'output.mkv', {}))
+        self.assertIn('--encoder x264', command)
+        self.assertIn('--vb 5000', command)
+        self.assertIn('--multi-pass --turbo', command)
+        self.assertIn('--audio 1 --aencoder copy', command)
+        self.assertIn('--subtitle 1 --subtitle-default', command)
+        self.assertIn('--crop-mode conservative', command)
+
     def test_h264_no_quality_bitrate_default(self):
         """H264 ohne Quality/Bitrate → auflösungsbasierte Bitrate + Multi-Pass + Turbo"""
         g = HandBrakeGenerator(mode='h264')

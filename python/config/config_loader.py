@@ -66,8 +66,9 @@ class TVBConfig:
         return self._loaded_path
 
     def get_format_params(self, format_type):
-        section = format_type if format_type in self.config else 'default'
-        return self.config.get(section, 'parameter', fallback='')
+        if format_type in {'movie', 'tvshow', 'custom'}:
+            return self.config.get(format_type, 'parameter', fallback='')
+        return self.config.get('default', 'parameter', fallback='')
 
     def get_preview_params(self):
         return self.config.get('preview', 'parameter', fallback='--stop-at duration:30')
