@@ -17,6 +17,24 @@ function App() {
   const [statsKey, setStatsKey] = useState(0);
   const [logs, setLogs] = useState([]);
   const [previewDuration, setPreviewDuration] = useState(30);
+  const [isRunning, setIsRunning] = useState(false);
+
+  const appendLog = (entry) => {
+    setLogs(prev => [...prev, {
+      timestamp: entry.timestamp || '',
+      level: entry.level || 'INFO',
+      message: entry.message || '',
+    }]);
+  };
+
+  const parseLogLine = (line) => {
+    const trimmed = line.trim();
+    if (!trimmed) return null;
+    const match = trimmed.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+-\s+(\w+)\s+-\s+(.*)$/);
+    return match
+      ? { timestamp: match[1], level: match[2], message: match[3] }
+      : { timestamp: '', level: 'INFO', message: trimmed };
+  };
 
   useEffect(() => {
     if (!window.electronAPI) return;
@@ -35,32 +53,38 @@ function App() {
     const unsubLog = window.electronAPI.onLog((data) => {
       if (!data) return;
       if (typeof data === 'object') {
-        setLogs(prev => [...prev, {
-          timestamp: data.timestamp || '',
-          level: data.level || 'INFO',
-          message: data.message || ''
-        }]);
+        appendLog(data);
       } else {
-        const trimmed = data.trim();
-        if (!trimmed) return;
-        const match = trimmed.match(/^(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+-\s+(\w+)\s+-\s+(.*)$/);
-        setLogs(prev => [...prev, match
-          ? { timestamp: match[1], level: match[2], message: match[3] }
-          : { timestamp: '', level: 'INFO', message: trimmed }
-        ]);
+        const parsed = parseLogLine(data);
+        if (parsed) appendLog(parsed);
       }
     });
 
+    const unsubError = window.electronAPI.onError((message) => {
+      appendLog({ level: 'ERROR', message: String(message || 'Transcode failed') });
+    });
+
     const unsubComplete = window.electronAPI.onComplete((data) => {
+      setIsRunning(false);
       setProgress(100);
       setFileProgress(100);
+      if (data && data.success === false) {
+        appendLog({ level: 'ERROR', message: `Transcode failed (exit code ${data.code ?? 'unknown'})` });
+      }
       // Force StatsDashboard to remount and reload the csv
       setStatsKey(k => k + 1);
+    });
+
+    window.electronAPI.readLogs().then((result) => {
+      if (!result?.content) return;
+      const loaded = result.content.split(/\r?\n/).map(parseLogLine).filter(Boolean);
+      setLogs(loaded);
     });
 
     return () => {
       unsubProgress();
       unsubLog();
+      unsubError();
       unsubComplete();
     };
   }, []);
@@ -82,7 +106,24 @@ function App() {
         <h1>TVB</h1>
       </header>
       <main>
-        <TranscodeControl previewDuration={previewDuration} />
+        <TranscodeControl
+          previewDuration={previewDuration}
+          isRunning={isRunning}
+          onStart={() => {
+            setIsRunning(true);
+            setProgress(0);
+            setFileProgress(0);
+            setCurrentFile(0);
+            setTotalFiles(0);
+            setFileName('');
+            setEta('');
+          }}
+          onStartRejected={(message) => {
+            setIsRunning(false);
+            appendLog({ level: 'ERROR', message });
+          }}
+          onStopped={() => setIsRunning(false)}
+        />
         <ProgressDisplay
           progress={progress}
           currentFile={currentFile}
@@ -98,7 +139,7 @@ function App() {
           <LogViewer logs={logs} onClear={handleClearLogs} />
         </CollapsibleSection>
         <CollapsibleSection title="Config" defaultOpen={false}>
-          <ConfigEditor onConfigSaved={handleConfigSaved} />
+          <ConfigEditor onConfigSaved={handleConfigSaved} onConfigLoaded={handleConfigSaved} />
         </CollapsibleSection>
       </main>
     </div>

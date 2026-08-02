@@ -45,11 +45,7 @@ elif command -v ffprobe &>/dev/null; then
     echo "[OK] ffprobe found in PATH: $(command -v ffprobe)"
 else
     echo "Downloading ffprobe (static build)..."
-    if [ "$ARCH" = "arm64" ]; then
-        FFMPEG_URL="https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip"
-    else
-        FFMPEG_URL="https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip"
-    fi
+    FFMPEG_URL="https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip"
     curl -L --fail -o ffprobe.zip "$FFMPEG_URL"
     unzip -q -o ffprobe.zip -d "$BIN_DIR"
     rm ffprobe.zip
@@ -69,31 +65,68 @@ LIBMI="$BIN_DIR/libmediainfo.dylib"
 if [ -f "$LIBMI" ]; then
     echo "[OK] libmediainfo already exists at $LIBMI"
 else
-    echo "Installing libmediainfo via Homebrew..."
+    echo "Installing libmediainfo..."
+
+    # Try Homebrew first
     if command -v brew &>/dev/null; then
         brew install libmediainfo 2>/dev/null || true
         MI_LIB=$(brew --prefix libmediainfo 2>/dev/null)/lib/libmediainfo.dylib
         if [ -f "$MI_LIB" ]; then
             cp "$MI_LIB" "$LIBMI"
-            echo "[OK] libmediainfo installed to $LIBMI"
+            echo "[OK] libmediainfo installed from Homebrew"
         else
-            echo "[WARN] Could not find libmediainfo after brew install"
+            echo "[WARN] brew install libmediainfo succeeded but lib not found at $MI_LIB"
         fi
-    else
-        echo "[WARN] Homebrew not found. Install manually: brew install libmediainfo"
+    fi
+
+    # Fallback: download from MediaArea if not found via brew
+    if [ ! -f "$LIBMI" ]; then
+        echo "Downloading libmediainfo.dylib from MediaArea..."
+        MEDIAINFO_VERSION="24.06"
+        if [ "$ARCH" = "arm64" ]; then
+            LIBMI_URL="https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Mac_x64_WithoutInstaller.tar.bz2"
+        else
+            LIBMI_URL="https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Mac_x64_WithoutInstaller.tar.bz2"
+        fi
+        TARBALL="libmediainfo.tar.bz2"
+        curl -L --fail -o "$TARBALL" "$LIBMI_URL" || {
+            echo "[WARN] Download failed. Install manually: brew install libmediainfo"
+            rm -f "$TARBALL"
+        }
+        if [ -f "$TARBALL" ]; then
+            tar -xjf "$TARBALL" -C /tmp
+            find /tmp -name "libmediainfo.dylib" -exec cp {} "$LIBMI" \; 2>/dev/null || true
+            rm "$TARBALL"
+            rm -rf /tmp/libmediainfo* 2>/dev/null || true
+            if [ -f "$LIBMI" ]; then
+                echo "[OK] libmediainfo.dylib downloaded to $LIBMI"
+            else
+                echo "[WARN] Could not extract libmediainfo.dylib from download"
+            fi
+        fi
     fi
 fi
 
 # --- Python dependencies ---
 echo ""
 echo "=== Python setup ==="
-if [ -f "$SCRIPT_DIR/requirements.txt" ]; then
-    pip3 install -r "$SCRIPT_DIR/requirements.txt" 2>/dev/null || true
+# Use a project-local environment. Never modify the user's global Python.
+PYTHON_BASE=$(command -v python3 || command -v python || true)
+if [ -z "$PYTHON_BASE" ]; then
+    echo "[ERROR] Python 3 is required to create the build environment."
+    exit 1
 fi
-pip3 install pymediainfo 2>/dev/null || true
+
+if [ ! -x "$SCRIPT_DIR/.venv/bin/python" ]; then
+    "$PYTHON_BASE" -m venv "$SCRIPT_DIR/.venv"
+fi
+
+PYTHON="$SCRIPT_DIR/.venv/bin/python"
+"$PYTHON" -m pip install --upgrade pip
+"$PYTHON" -m pip install -r "$SCRIPT_DIR/requirements.txt"
 
 echo ""
 echo "=== Setup complete ==="
 echo "Binaries in: $BIN_DIR"
 echo ""
-echo "Next: npm start"
+echo "Next: npm install && npm run build"

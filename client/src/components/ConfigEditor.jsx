@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './ConfigEditor.css';
 
-function ConfigEditor({ onConfigSaved }) {
+function ConfigEditor({ onConfigSaved, onConfigLoaded }) {
   const [config, setConfig] = useState('');
   const [isSaving, setIsSaving] = useState(false);
 
@@ -14,6 +14,7 @@ function ConfigEditor({ onConfigSaved }) {
       const result = await window.electronAPI.readConfig();
       if (result.content) {
         setConfig(result.content);
+        if (onConfigLoaded) onConfigLoaded(result.content);
       }
     }
   };

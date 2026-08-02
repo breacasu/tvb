@@ -1,16 +1,15 @@
 # TVB - Transcode Video Batch Configuration
-# Encoding presets for different content types
 
 [tvshow]
 # Cross-platform H.265 encoding for TV shows
 parameter = --mode hevc --quality 24 --add-audio all --add-subtitle all
 
 [movie]
-# Software H.265 encoding for movies (German/English audio)
+# H.265 encoding for movies with German and English audio
 parameter = --mode hevc --quality 24 --add-audio ger --add-audio eng --add-subtitle all
 
 [custom]
-# Software H.265 encoding, all tracks
+# H.265 encoding with all available audio and subtitle tracks
 parameter = --mode hevc --quality 24 --add-audio all --add-subtitle all
 
 [preview]
@@ -18,11 +17,11 @@ parameter = --mode hevc --quality 24 --add-audio all --add-subtitle all
 parameter = --stop-at duration:30
 
 [default]
-# Output directory (adjust to your system)
-outputdir = '/path/to/output/directory'
+# Output directory; adjust this value or pass -o/--output
+outputdir = './output'
 
-# File Handling
-preserve_file_date = yes         # Preserve original file timestamps
+# File handling
+preserve_file_date = yes
 
-# Dolby Atmos Support (optional)
+# Dolby Atmos preservation
 preserve_atmos_audio = yes

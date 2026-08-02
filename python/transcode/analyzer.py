@@ -8,28 +8,19 @@ import sys
 from pathlib import Path
 from typing import Dict, Any, Optional
 
+from tool_paths import resolve_tool
+from transcode.crop_detector import CropDetector
+
 
 class MediaAnalyzer:
     def __init__(self):
         self.ffprobe_path = self._find_ffprobe()
 
     def _find_ffprobe(self) -> str:
-        if getattr(sys, '_MEIPASS', None):
-            bundled = Path(sys._MEIPASS) / "ffprobe"
-            if bundled.exists():
-                return str(bundled)
-
-        script_dir = Path(__file__).resolve().parent.parent.parent
-        bundled = script_dir / "bin" / "ffprobe"
-        if bundled.exists():
-            return str(bundled)
-
-        try:
-            result = subprocess.run(['which', 'ffprobe'],
-                                   capture_output=True, text=True, check=True)
-            return result.stdout.strip()
-        except (subprocess.CalledProcessError, FileNotFoundError):
-            return 'ffprobe'
+        found = resolve_tool("ffprobe")
+        if found:
+            return found
+        return "ffprobe.exe" if sys.platform == "win32" else "ffprobe"
 
     def scan_media(self, file_path: str) -> Dict[str, Any]:
         if not os.path.exists(file_path):
@@ -37,12 +28,9 @@ class MediaAnalyzer:
         if not os.access(file_path, os.R_OK):
             raise RuntimeError(f"File is not readable: '{file_path}'")
 
-        try:
-            mime_type, _ = mimetypes.guess_type(file_path)
-            if mime_type and not mime_type.startswith(('video/', 'audio/')):
-                raise RuntimeError(f"File does not appear to be a media file: '{file_path}'")
-        except Exception:
-            pass
+        mime_type, _ = mimetypes.guess_type(file_path)
+        if mime_type and not mime_type.startswith(('video/', 'audio/')):
+            raise RuntimeError(f"File does not appear to be a media file: '{file_path}'")
 
         cmd = [
             self.ffprobe_path,
@@ -89,6 +77,11 @@ class MediaAnalyzer:
 
     def get_stream_info(self, media_info: Dict[str, Any], stream_type: str) -> list:
         return [s for s in media_info.get('streams', []) if s.get('codec_type') == stream_type]
+
+    def detect_crop(self, file_path: str, mode: str = 'conservative') -> str:
+        """Detect unused borders through the bundled HandBrakeCLI."""
+        detector = CropDetector(mode=mode, handbrake_path=resolve_tool('HandBrakeCLI'))
+        return detector.detect_crop(file_path)
 
 
 def scan_media(file_path: str) -> Dict[str, Any]:

@@ -1,180 +1,152 @@
-# TVB — Transcode Video Batch
+# tvb - Transcode Video Batch
 
-Electron-App mit Python-Backend zum Batch-Transkodieren von Videodateien via HandBrakeCLI.
-
-Der HandBrakeCLI-Generator ist **1:1 kompatibel** zu Lisa Meltons `transcode-video.rb`.
+Cross-platform GUI and CLI for batch video transcoding with HandBrakeCLI.
+The Python backend is shared by both interfaces and does not require Ruby.
 
 ## Features
 
-- **Batch-Encoding**: Beliebig viele Dateien oder ganze Ordner in einem Durchlauf
-- **Auto-Detect Format**: Erkennt TV-Show (S01E01) vs. Movie automatisch
-- **Forced Format**: Überschreibt Auto-Detect via `-f movie|tvshow|custom`
-- **Preview-Modus**: Nur 30 Sekunden encodieren (`-P`)
-- **Dry-Run**: Befehl anzeigen ohne zu encodieren (`-d`)
-- **Dolby Atmos Preservation**: Atmos-Tracks werden automatisch als Copy durchgereicht
-- **File Date Preservation**: Output behält Erstellungsdatum des Inputs
-- **HandBrakeCLI Version Check**: Vergleicht installierte Version mit aktuellster
+- Batch encoding of files, directories and recursive directory trees
+- Automatic TV-show/movie detection via `S01E01` filenames
+- Forced format selection with `-f movie|tvshow|custom`
+- Preview mode with `-P`
+- Dry-run mode with `-d`
+- Dolby Atmos detection via ffprobe first; MediaInfo is used only for ambiguous E-AC-3/TrueHD tracks
+- Invalid input metadata is reported without modifying or remuxing the source
+- Crop detection through the `MediaAnalyzer`
+- File-date preservation
+- JSON output for the GUI and readable text output with `--text`
 
-## Verzeichnisstruktur
+Release installers contain the required runtime tools. Development builds use
+the project-local `.venv` and a local tool cache. System Python installations
+are not modified by the setup scripts.
 
-```
-tvb-electron/
-├── electron/              # Electron main + preload
-│   ├── main.js
-│   └── preload.js
-├── client/                # React-Frontend (Vite)
-│   └── src/
-│       ├── App.jsx
-│       ├── index.css
-│       └── components/
-├── python/                # Python-Backend
-│   ├── tvb.py             # CLI-Einstieg
-│   ├── tvb-config.ini     # Encoding-Presets
-│   ├── transcode/
-│   │   ├── generator.py   # HandBrakeCLI-Befehl (Ruby-kompatibel)
-│   │   └── analyzer.py    # ffprobe Media-Analyse
-│   ├── features/
-│   │   ├── atmos.py       # Dolby Atmos Detection
-│   │   └── statistics.py  # CSV-Statistiken
-│   └── config/
-│       └── config_loader.py
-├── bin/                   # Gebündelte Binaries
-│   ├── HandBrakeCLI
-│   ├── ffprobe
-│   └── libmediainfo.dylib
-├── setup-electron.sh      # Electron-Installation für Dev
-├── package.json
-└── vite.config.js
+## Structure
+
+```text
+tvb/
+├── electron/              Electron main process and preload bridge
+├── client/                React frontend
+├── python/                Shared CLI backend
+│   ├── transcode/         Analyzer, generator and crop detection
+│   ├── features/          Atmos and statistics
+│   └── config/            Configuration loader
+├── scripts/               Build helpers
+├── tests/                 Unit tests
+├── bin/                   Local platform-tool cache, not source-controlled
+└── package.json
 ```
 
-## Installation (Development)
+## Development Setup
 
-### 1. Electron
+### Windows
+
+```batch
+setup-electron.bat
+setup.bat
+python scripts/stage_tools.py
+python scripts/verify_tools.py
+npm install
+npm run build:win
+npm run start:win
+```
+
+### macOS/Linux
 
 ```bash
 ./setup-electron.sh
-```
-
-Installiert Electron v42.2.0 standalone unter `~/.local/electron/`.
-
-### 2. Abhängigkeiten
-
-```bash
+./setup.sh
+python scripts/stage_tools.py
+python scripts/verify_tools.py
 npm install
-```
-
-### 3. Python-Build-Tools (optional, nur für Distribution)
-
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
-pip install pyinstaller pymediainfo
-```
-
-## Verwendung
-
-### CLI (ohne Electron)
-
-```bash
-# Einzelne Datei
-python3 python/tvb.py -i "movie.mkv" -o "./output"
-
-# Mehrere Dateien
-python3 python/tvb.py \
-  -i "movie1.mkv" \
-  -i "movie2.mkv" \
-  -i "movie3.mkv" \
-  -o "./output"
-
-# Ganzes Verzeichnis
-python3 python/tvb.py -i "./videos/" -o "./output"
-
-# TV-Show forcieren
-python3 python/tvb.py -i "episode.mkv" -o "./output" -f tvshow
-
-# Preview (30s) + Dry-Run
-python3 python/tvb.py -i "movie.mkv" -o "./output" -P -d --debug
-```
-
-### GUI (Electron)
-
-```bash
+npm run build
 npm start
 ```
 
-### Konfiguration
+`setup.sh` creates `.venv` and installs all Python build dependencies there.
+It does not install packages into the system Python.
 
-Die Datei `python/tvb-config.ini` enthält Presets für `[movie]`, `[tvshow]` und `[custom]`:
+## CLI
+
+### Windows
+
+```batch
+.venv\Scripts\python.exe python\tvb.py -i "movie.mkv" -o "output"
+.venv\Scripts\python.exe -c "from transcode.analyzer import MediaAnalyzer; print(MediaAnalyzer().detect_crop('movie.mkv'))"
+```
+
+### macOS/Linux
+
+```bash
+.venv/bin/python python/tvb.py -i "movie.mkv" -o "output"
+.venv/bin/python -c "from transcode.analyzer import MediaAnalyzer; print(MediaAnalyzer().detect_crop('movie.mkv'))"
+```
+
+Examples:
+
+```text
+tvb.py -i movie.mkv -o output -f movie
+tvb.py -i videos/ -o output -P -d --debug
+tvb.py -i episode.mkv --preserve-atmos
+tvb.py -i episode.mkv --no-preserve-atmos
+MediaAnalyzer().detect_crop("movie.mkv", mode="conservative")
+```
+
+The packaged Windows application provides `tvb.bat` for the CLI. The GUI executable is internally named
+`tvb-gui.exe` so it cannot collide with the Windows CLI `tvb.exe`.
+
+## Configuration
+
+`python/tvb-config.ini` contains encoding presets. Tool paths are deliberately
+not user configuration: bundled tools are resolved automatically. Developers
+may set `TVB_TOOLS_DIR` to use a local tool cache.
 
 ```ini
 [movie]
 parameter = --mode hevc --quality 24 --add-audio ger --add-audio eng --add-subtitle all
 
 [tvshow]
-parameter = --add-audio all --add-subtitle all -x encoder=vt_h265 -x quality=56 -x encoder-preset=quality
+parameter = --mode hevc --quality 24 --add-audio all --add-subtitle all
+
+[custom]
+parameter = --mode hevc --quality 24 --add-audio all --add-subtitle all
 ```
 
-Die Parameter werden identisch zu Lisa Meltons `transcode-video.rb` geparst (siehe `PROJECT_PLAN.md`).
+Statistics use ISO-8601 timestamps. The old locale setting is no longer
+needed and is ignored.
 
-## Build & Distribution
-
-### Vollständiger Build (React + Python)
+## Build and Distribution
 
 ```bash
-npm run build
+npm run build       # React + Python for macOS/Linux
+npm run build:win   # React + Python for Windows
+npm run dist:win   # Windows installer
+npm run dist        # macOS distribution
+npm run dist:linux  # Linux distribution
 ```
 
-### macOS Distribution
+The Python build creates the `tvb` executable and embeds the required tools
+available in the platform tool bundle. Generated files in
+`python/dist`, `python/build` and `release` are not source files.
+
+The planned release process downloads exact tool versions per platform,
+verifies SHA256 checksums, creates a native installer and publishes the
+installer as a GitHub Release asset. Platform binaries are not committed to
+the Git repository.
+
+## Testing
 
 ```bash
-npm run dist
+python -m unittest discover tests -v
+npm run build:react
 ```
 
-Erzeugt `release/TVB-1.0.0-arm64.dmg` + `release/TVB-1.0.0-arm64-mac.zip`.
+Real media test files are kept outside the repository. The current Windows
+test collection is available at:
 
-### Linux Distribution
-
-```bash
-npm run dist:linux
+```text
+\\DS1817plus\Media\Unsortiert\Encode_Testfiles
 ```
 
-### GitHub Actions CI
+## License
 
-Bei einem git Tag `v*` baut der Workflow `.github/workflows/build.yml` automatisch macOS + Linux.
-
-## Technische Details
-
-### Ruby-Kompatibilität
-
-Der `HandBrakeGenerator` (`generator.py`) erzeugt **identische** HandBrakeCLI-Befehle wie Lisa Meltons `transcode-video.rb`. Die INI-Config ist nur ein Preset-Speicher — alle Parameter werden direkt an den Generator übergeben.
-
-Abweichungen (bewusst):
-- Audio-Track-Namen mit Kanalinfo: `"German AAC 5.1"`
-- Untertitel-Namen lesbarer: `"German forced"` statt rohem `title`-Feld
-- EAC3-Passthrough erfasst auch eac3 (verhindert sinnloses Re-encode)
-
-### Version Check
-
-Beim Start prüft `tvb.py`:
-1. Lokale HandBrakeCLI-Version via `--version`
-2. Aktuellste Version von `https://handbrake.fr/downloads2.php`
-3. Loggt z.B. `"installed 1.8.2 (latest 1.11.1) — update recommended"`
-
-### CLI vs GUI
-
-Das Python-Backend ist CLI-first und erzeugt JSON-Zeilen auf stdout für Electron. Gleiches Backend für beide Modi — keine Code-Duplikation.
-
-## Abhängigkeiten
-
-| Komponente | Quelle | Bemerkung |
-|---|---|---|
-| HandBrakeCLI | `bin/` (gebündelt) | macOS, statisch gelinkt |
-| ffprobe | `bin/` (gebündelt) | Von GitHub Release, statisch |
-| libmediainfo | `bin/` (gebündelt) | Für pymediainfo |
-
-## Lizenz
-
-MIT License. Siehe `LICENSE`.
-
-Copyright (c) 2026 Breacasu + DeepSeek V4 — Electron-Frontend, Python-Integration, zusätzliche Features.
-Copyright (c) 2025 Lisa Melton — `transcode-video.rb` Algorithmus (Portierung in `generator.py`).
+MIT License. See `LICENSE` and the third-party notices included with releases.

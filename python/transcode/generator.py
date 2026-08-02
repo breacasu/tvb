@@ -127,10 +127,17 @@ class HandBrakeGenerator:
         cmd.extend(subtitle_options)
 
         encoder_options = self._get_encoder_options()
+        custom_encoder_options = self.extra_options.get('encopts')
+        if custom_encoder_options:
+            encoder_options = ':'.join(
+                option for option in [encoder_options, custom_encoder_options] if option
+            )
         if encoder_options:
             cmd.extend(['--encopts', encoder_options])
 
         for name, value in self.extra_options.items():
+            if name == 'encopts':
+                continue
             cmd.append(f'--{name}')
             if value is not None:
                 cmd.append(value)
@@ -197,14 +204,12 @@ class HandBrakeGenerator:
             elif self.mode == self.MODE_AV1:
                 if bitrate is None:
                     quality = self._format_av1_quality(self.quality)
-                if preset is None:
-                    preset = self._clamp_av1_preset(self.preset)
+                preset = self._clamp_av1_preset(self.preset)
 
             elif self.mode == self.MODE_NVENC_AV1:
                 if bitrate is None:
                     quality = self._format_nvenc_av1_quality(self.quality)
-                if preset is None:
-                    preset = self._clamp_av1_preset(self.preset)
+                preset = self._clamp_av1_preset(self.preset)
 
         if preset and 'encoder-preset' not in self.extra_options:
             options.extend(['--encoder-preset', preset])
@@ -621,6 +626,8 @@ class HandBrakeGenerator:
                     self.set_burn_subtitle(int(param_value))
             elif param_name == 'ac3-surround':
                 self.ac3_surround = True
+            elif param_name == 'no-bframe-refs':
+                self.bframe_refs = False
             elif param_name == 'aac-encoder' and param_value:
                 if param_value in ['av_aac', 'fdk_aac', 'ca_aac']:
                     self.aac_encoder = param_value

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './TranscodeControl.css';
 
-function TranscodeControl({ previewDuration }) {
+function TranscodeControl({ previewDuration, isRunning, onStart, onStartRejected, onStopped }) {
   const [input, setInput] = useState([]);
   const [inputLabel, setInputLabel] = useState('');
   const [output, setOutput] = useState('');
@@ -9,25 +9,23 @@ function TranscodeControl({ previewDuration }) {
   const [preview, setPreview] = useState(false);
   const [atmos, setAtmos] = useState(true);
   const [dryRun, setDryRun] = useState(false);
-  const [isRunning, setIsRunning] = useState(false);
-
   const handleStart = async () => {
     if (!input || input.length === 0) return;
-    setIsRunning(true);
+    if (onStart) onStart();
     if (window.electronAPI) {
-      await window.electronAPI.startTranscode({
-        input, output, format: format || undefined,
-        preview, dryRun, atmos,
-      });
-      const unsubComplete = window.electronAPI.onComplete((data) => {
-        setIsRunning(false);
-        if (data.success) {
-          console.log('Transcoding complete');
-        } else {
-          console.error('Transcoding failed');
+      try {
+        const result = await window.electronAPI.startTranscode({
+          input, output, format: format || undefined,
+          preview, dryRun, atmos,
+        });
+        if (result && result.started === false) {
+          if (onStartRejected) onStartRejected(result.error || 'Could not start transcoding');
         }
-        unsubComplete();
-      });
+      } catch (error) {
+        if (onStartRejected) onStartRejected(String(error));
+      }
+    } else if (onStartRejected) {
+      onStartRejected('Electron API is not available');
     }
   };
 
@@ -35,7 +33,7 @@ function TranscodeControl({ previewDuration }) {
     if (window.electronAPI) {
       await window.electronAPI.stopTranscode();
     }
-    setIsRunning(false);
+    if (onStopped) onStopped();
   };
 
   const handleSelectInput = async () => {

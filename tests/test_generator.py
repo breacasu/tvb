@@ -216,6 +216,18 @@ class TestGeneratorEncoderOptions(unittest.TestCase):
         self.assertIn('vbv-maxrate=15000', opts)
         self.assertIn('vbv-bufsize=15000', opts)
 
+    def test_custom_encopts_are_merged(self):
+        g = HandBrakeGenerator(mode='nvenc_hevc')
+        g.parse_transcode_video_params('-x encopts=custom=1')
+        command = g.generate_command_list('input.mkv', 'output.mkv', {})
+        self.assertEqual(command.count('--encopts'), 1)
+        self.assertIn('spatial_aq=1:rc-lookahead=20:b_ref_mode=2:custom=1', command)
+
+    def test_no_bframe_refs_is_applied(self):
+        g = HandBrakeGenerator(mode='nvenc_hevc')
+        g.parse_transcode_video_params('--no-bframe-refs')
+        self.assertNotIn('b_ref_mode=2', g._get_encoder_options())
+
 
 if __name__ == '__main__':
     runner = unittest.TextTestRunner(verbosity=2)

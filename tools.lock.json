@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "generated_for": "tvb",
+  "platforms": {
+    "win32-x64": {
+      "HandBrakeCLI": {
+        "filename": "HandBrakeCLI.exe",
+        "version": "1.10.2",
+        "sha256": "6692D82F1C773F41CA60D08FF3FC87D0D9CD32D38FDD9688799FBEDAF54C8919",
+        "source": "https://handbrake.fr/downloads2.php"
+      },
+      "ffprobe": {
+        "filename": "ffprobe.exe",
+        "version": "8.1.1",
+        "sha256": "0FDE260F5ABD35C9CAFD96F594CC76365A780C1B73A90E35B6A3409EA1DB1BF0",
+        "source": "https://www.gyan.dev/ffmpeg/builds/"
+      },
+      "libmediainfo": {
+        "filename": "libmediainfo.dll",
+        "version": "21.09",
+        "sha256": "F59EDCA0266E70FF357E574AC48B43C3F809F804AF11339BFAAD394D2BCC4E26",
+        "source": "https://mediaarea.net/en/MediaInfo/Download/Windows"
+      }
+    },
+    "darwin-universal": {
+      "status": "pending_platform_artifacts"
+    },
+    "linux-x64": {
+      "status": "pending_platform_artifacts"
+    }
+  }
+}

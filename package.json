@@ -1,21 +1,30 @@
 {
-  "name": "tvb-electron",
+  "name": "tvb",
   "version": "1.0.0",
-  "description": "TVB - Transcode Video Batch (Electron GUI + Python Backend)",
+  "description": "TVB - Transcode Video Batch (GUI and CLI)",
+  "author": "breacasu <breacasu@posteo.de>",
+  "license": "MIT",
   "main": "electron/main.js",
   "scripts": {
-    "start": "unset ELECTRON_RUN_AS_NODE && /Users/stephan/.local/electron/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron .",
+    "start": "./start.sh",
+    "start:win": "start.bat",
     "dev:react": "vite",
+    "verify:tools": "python scripts/verify_tools.py",
+    "stage:tools": "python scripts/stage_tools.py",
     "build:react": "vite build",
-    "build:python": "cd python && ../.venv/bin/pyinstaller --onefile --name tvb tvb.py --paths . --add-binary ../bin/HandBrakeCLI:. --add-binary ../bin/libmediainfo.dylib:. --add-binary ../bin/ffprobe:. --hidden-import pymediainfo --hidden-import configparser --hidden-import transcode.analyzer --hidden-import transcode.generator --hidden-import features.atmos --hidden-import features.statistics --hidden-import config.config_loader --distpath dist --workpath build --specpath .",
+    "build:python": "python scripts/build_python.py",
+    "build:python:win": "python scripts/build_python.py",
     "build": "npm run build:react && npm run build:python",
+    "build:win": "npm run build:react && npm run build:python:win",
     "dist": "npm run build && npx electron-builder --mac",
-    "dist:win": "npm run build && npx electron-builder --win",
+    "dist:win": "npm run build:win && npx electron-builder --win",
     "dist:linux": "npm run build && npx electron-builder --linux"
   },
   "build": {
-    "appId": "com.tvb.electron",
-    "productName": "TVB",
+    "appId": "com.breacasu.tvb",
+    "electronVersion": "42.2.0",
+    "productName": "tvb",
+    "executableName": "tvb-gui",
     "directories": {
       "buildResources": "build",
       "output": "release"
@@ -23,28 +32,36 @@
     "files": [
       "electron/**/*",
       "client/dist/**/*",
-      "python/**/*",
+      "!python/**/*",
       "!python/build/**/*",
       "!python/__pycache__/**/*",
       "!python/**/*.pyc",
       "!python/**/__pycache__",
       "!python/tvb.spec"
     ],
-"extraResources": [
+    "extraResources": [
       {
         "from": "python/dist",
         "to": "app/python/dist",
-        "filter": ["tvb"]
+        "filter": [
+          "tvb*"
+        ]
       },
       {
         "from": "python",
         "to": "app/python",
-        "filter": ["tvb-config.ini"]
+        "filter": [
+          "tvb-config.ini"
+        ]
       }
     ],
-"mac": {
+    "afterPack": "build/afterPack.js",
+    "mac": {
       "category": "public.app-category.video",
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "icon": "build/icon.icns",
       "hardenedRuntime": true,
       "gatekeeperAssess": false
@@ -52,17 +69,18 @@
     "win": {
       "target": [
         "nsis"
-      ]
+      ],
+      "icon": "build/icon.ico"
     },
     "linux": {
       "target": [
         "AppImage"
-      ]
+      ],
+      "icon": "build/icon.png"
     }
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^6.0.2",
-    "electron": "^42.2.0",
     "electron-builder": "^26.0.0",
     "vite": "^8.0.13"
   },

@@ -1,21 +1,35 @@
+# Dependencies and local environments
 node_modules/
-client/dist/
-*.pyc
-__pycache__/
+.venv/
 python/__pycache__/
-python/transcode.log
-python/tvb-stats.csv
-python/output/
+python/**/__pycache__/
+*.py[cod]
+
+# Generated frontend and Python artifacts
+client/dist/
 python/build/
 python/dist/
-python/tvb.spec
-transcode.log
-.venv/
+python/*.spec
 release/
-build/icons.iconset/
-build/icon.icns
-.DS_Store
 
-# Binaries werden nicht committed, sondern per setup.sh / setup.bat installiert
-bin/*
-!/bin/.gitkeep
+# Downloaded platform tools and local caches
+bin/
+vendor/
+tools-cache/
+
+# Runtime data
+*.log
+tvb-stats.csv
+output/
+
+# Local configuration and temporary archives
+python/tvb-config.ini.local
+*.zip
+*.tmp
+*.temp
+
+# OS and IDE files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
