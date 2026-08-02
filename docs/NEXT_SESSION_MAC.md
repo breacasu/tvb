@@ -6,7 +6,7 @@ This document is the handoff for the next coding session on macOS.
 
 - Repository: `https://github.com/breacasu/tvb`
 - Branch: `dev`
-- Current commit: `6e75701 Add Windows validation handoff`
+- Current commit: latest commit on `dev` (check with `git log -1`)
 - Do not work on or push to `main`.
 - The old local folders `tvb-electron` and the previous non-git `tvb` copy are not the source of truth anymore.
 

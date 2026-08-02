@@ -6,7 +6,7 @@ This document is for the next validation session on Windows.
 
 - Repository: `https://github.com/breacasu/tvb`
 - Branch: `dev`
-- Current commit: `6e75701 Add Windows validation handoff`
+- Current commit: latest commit on `dev` (check with `git log -1`)
 - Do not work on or push to `main`.
 - Use a local Windows checkout. Do not use the NAS as the Git worktree.
 
