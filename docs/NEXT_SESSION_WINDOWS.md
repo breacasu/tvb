@@ -13,8 +13,8 @@ This document is for the next validation session on Windows.
 Clone or update the repository on Windows:
 
 ```bat
-git clone --branch dev https://github.com/breacasu/tvb.git C:\Code\tvb
-cd /d C:\Code\tvb
+git clone --branch dev https://github.com/breacasu/tvb.git C:\Users\Nutzer\code\tvb
+cd /d C:\Users\Nutzer\code\tvb
 ```
 
 ## Current State
