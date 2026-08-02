@@ -53,9 +53,8 @@ Stand: 2026-08-02
 ## Still Open
 
 - Move the current project into the canonical `breacasu/tvb` repository
-- Validate a universal Intel/Apple Silicon macOS artifact separately; the current Mac build is arm64
 - Obtain a valid Developer ID certificate for signed and notarized macOS releases
-- Complete Linux HandBrake standalone runtime; upstream currently publishes only a Flatpak bundle
+- Linux is not supported; upstream only publishes HandBrake as a Flatpak bundle
 - Reproducible CI downloads for all supported platforms
 - Linux HandBrakeCLI bundle strategy
 - Native Linux build and installer; macOS arm64 build is validated locally

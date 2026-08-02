@@ -39,7 +39,5 @@ installer as a GitHub Release asset. A clean runner must never use tools from
 its global `PATH`.
 
 The Windows x64/ARM64 and macOS arm64 manifests are populated from verified
-platform artifacts. Linux is still the most involved target because HandBrake
-currently distributes its Linux CLI through Flatpak rather than a simple
-standalone archive; the release build needs a reproducible source build or an
-extracted, license-compliant runtime bundle.
+platform artifacts. Linux is currently unsupported because HandBrake
+distributes its Linux CLI through Flatpak rather than a standalone archive.

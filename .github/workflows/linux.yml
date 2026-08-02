@@ -61,7 +61,7 @@ jobs:
           manifest = json.loads(Path("tools.lock.json").read_text(encoding="utf-8"))
           for platform in ("linux-x64", "linux-arm64"):
               status = manifest["platforms"][platform].get("status")
-              if status != "pending_handbrake_standalone_artifact":
+              if status != "unsupported":
                   raise SystemExit(f"Unexpected {platform} manifest status: {status}")
               print(f"{platform}: {status}")
           PY

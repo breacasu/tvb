@@ -61,8 +61,8 @@ The exact mount path may differ on macOS.
 ## Immediate Mac Work
 
 The macOS arm64 tool manifest is now populated for the current Apple Silicon
-target. `linux-x64` and `linux-arm64` remain pending because HandBrake only
-publishes a Linux Flatpak bundle, not a standalone CLI runtime.
+target. Linux is not supported because HandBrake only publishes a Flatpak
+bundle, not a standalone CLI runtime.
 
 Complete the macOS target first:
 
@@ -78,7 +78,7 @@ Complete the macOS target first:
 10. Test the installed `.dmg`/application, not only the development start.
 
 The steps above were completed on macOS 26.5 arm64. See `STATUS.md` for the
-validated tool versions, previews and remaining signing/Intel follow-up.
+validated tool versions, previews and remaining signing follow-up.
 
 Expected macOS runtime tools:
 

@@ -63,12 +63,12 @@
       }
     },
     "linux-x64": {
-      "status": "pending_handbrake_standalone_artifact",
-      "note": "HandBrake 1.11.2 publishes Linux CLI only inside a Flatpak bundle; a standalone, license-compliant runtime extraction or reproducible source build is still required."
+      "status": "unsupported",
+      "note": "Linux is not supported until a standalone, license-compliant HandBrake runtime is available."
     },
     "linux-arm64": {
-      "status": "pending_handbrake_standalone_artifact",
-      "note": "HandBrake 1.11.2 publishes Linux CLI only inside a Flatpak bundle; a standalone, license-compliant runtime extraction or reproducible source build is still required."
+      "status": "unsupported",
+      "note": "Linux is not supported until a standalone, license-compliant HandBrake runtime is available."
     }
   }
 }

@@ -50,7 +50,7 @@ npm run build:win
 npm run start:win
 ```
 
-### macOS/Linux
+### macOS
 
 ```bash
 ./setup-electron.sh
@@ -65,8 +65,9 @@ npm start
 `setup.sh` creates `.venv` and installs all Python build dependencies there.
 It does not install packages into the system Python.
 
-The Linux manifest remains pending until HandBrake provides a standalone CLI
-runtime or TVB has a reproducible, license-compliant Flatpak extraction/build.
+Linux is currently not supported because HandBrake does not publish a
+standalone Linux CLI runtime. The Linux GitHub Actions workflow only validates
+upstream tools and development checks.
 
 ## CLI
 
@@ -77,7 +78,7 @@ runtime or TVB has a reproducible, license-compliant Flatpak extraction/build.
 .venv\Scripts\python.exe -c "from transcode.analyzer import MediaAnalyzer; print(MediaAnalyzer().detect_crop('movie.mkv'))"
 ```
 
-### macOS/Linux
+### macOS
 
 ```bash
 .venv/bin/python python/tvb.py -i "movie.mkv" -o "output"
@@ -120,11 +121,10 @@ needed and is ignored.
 ## Build and Distribution
 
 ```bash
-npm run build       # React + Python for macOS/Linux
-npm run build:win   # React + Python for Windows
-npm run dist:win   # Windows installer
-npm run dist        # macOS distribution
-npm run dist:linux  # Linux distribution
+  npm run build       # React + Python for macOS
+  npm run build:win   # React + Python for Windows
+  npm run dist:win   # Windows installer
+  npm run dist        # macOS distribution
 ```
 
 The Python build creates the `tvb` executable and embeds the required tools
