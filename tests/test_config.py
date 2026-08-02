@@ -2,6 +2,7 @@ import sys
 import tempfile
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "python"))
 
@@ -45,6 +46,17 @@ class TestFormatConfigDefaults(unittest.TestCase):
             "parameter = --mode hevc --quality 19\n"
         )
         self.assertEqual(config.get_format_params("movie"), "--mode hevc --quality 19")
+
+    def test_shared_data_config_is_used_when_no_explicit_path_exists(self):
+        with tempfile.TemporaryDirectory() as directory:
+            shared = Path(directory)
+            (shared / "tvb-config.ini").write_text(
+                "[movie]\nparameter = --mode av1 --quality 30\n",
+                encoding="utf-8",
+            )
+            with patch.dict("os.environ", {"TVB_DATA_DIR": str(shared)}, clear=False):
+                config = TVBConfig()
+            self.assertEqual(config.get_format_params("movie"), "--mode av1 --quality 30")
 
 
 if __name__ == "__main__":

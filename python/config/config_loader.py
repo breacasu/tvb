@@ -4,6 +4,8 @@ import logging
 import os
 import sys
 
+from data_paths import resolve_data_dir
+
 CONFIG_FILENAME = 'tvb-config.ini'
 VIDEO_EXTENSIONS = {".mp4", ".mkv", ".avi", ".mov", ".flv", ".m4v", ".mpg", ".mpeg", ".wmv"}
 
@@ -25,6 +27,8 @@ class TVBConfig:
         env_path = os.environ.get('TVB_CONFIG_PATH')
         if env_path:
             search_paths.append(env_path)
+
+        search_paths.append(str(resolve_data_dir() / CONFIG_FILENAME))
 
         try:
             alt_path = os.path.join(os.path.dirname(__file__), '..', CONFIG_FILENAME)

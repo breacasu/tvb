@@ -55,7 +55,7 @@ function getPythonCwd() {
 }
 
 function getTvbConfigPath() {
-  return path.join(app.getPath('userData'), 'tvb-config.ini');
+  return path.join(getDataDir(), 'tvb-config.ini');
 }
 
 function getDataDir() {
