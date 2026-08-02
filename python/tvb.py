@@ -19,6 +19,7 @@ if str(_pkg_dir) not in sys.path:
     sys.path.insert(0, str(_pkg_dir))
 
 from config.config_loader import TVBConfig, VIDEO_EXTENSIONS
+from data_paths import resolve_data_dir
 from tool_paths import resolve_tool
 from transcode.analyzer import MediaAnalyzer
 from transcode.generator import HandBrakeGenerator
@@ -30,7 +31,8 @@ __version__ = "1.0.0"
 __author__ = "breacasu <breacasu@posteo.de>"
 __license__ = "MIT"
 
-DATA_DIR = Path(os.environ.get("TVB_DATA_DIR", Path.cwd()))
+DATA_DIR = resolve_data_dir()
+os.environ.setdefault("TVB_DATA_DIR", str(DATA_DIR))
 LOG_FILE = str(DATA_DIR / "transcode.log")
 terminal_columns, _ = shutil.get_terminal_size()
 config = None

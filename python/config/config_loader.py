@@ -10,7 +10,10 @@ VIDEO_EXTENSIONS = {".mp4", ".mkv", ".avi", ".mov", ".flv", ".m4v", ".mpg", ".mp
 
 class TVBConfig:
     def __init__(self, config_path=None):
-        self.config = configparser.ConfigParser()
+        # Existing user configs may contain an older preset followed by the
+        # active replacement. ConfigParser's last-value behavior preserves
+        # that established editing workflow.
+        self.config = configparser.ConfigParser(strict=False)
         self._loaded_path = None
         self._load(config_path)
 

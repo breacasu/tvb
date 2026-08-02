@@ -8,6 +8,9 @@ import os
 import platform
 import shutil
 import sys
+import urllib.parse
+import urllib.request
+import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -32,6 +35,69 @@ def file_hash(path: Path) -> str:
         for chunk in iter(lambda: source.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest().upper()
+
+
+def download_archive(url: str, destination: Path) -> Path:
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    if destination.is_file():
+        return destination
+
+    partial = destination.with_suffix(destination.suffix + ".part")
+    existing_size = partial.stat().st_size if partial.is_file() else 0
+    headers = {"User-Agent": "tvb-tool-stager/1.0"}
+    if existing_size:
+        headers["Range"] = f"bytes={existing_size}-"
+        print(f"Resuming {destination.name} at {existing_size} bytes")
+    request = urllib.request.Request(url, headers=headers)
+    print(f"Downloading {url}")
+    with urllib.request.urlopen(request, timeout=180) as response:
+        append = existing_size > 0 and response.getcode() == 206
+        mode = "ab" if append else "wb"
+        if existing_size and not append:
+            print("Server did not accept resume; restarting archive download")
+        with partial.open(mode) as output:
+            shutil.copyfileobj(response, output, length=1024 * 1024)
+    partial.replace(destination)
+    return destination
+
+
+def extract_windows_tool(archive: Path, expected_filename: str, destination: Path) -> Path:
+    if archive.suffix.lower() != ".zip":
+        raise RuntimeError(f"Automatic Windows extraction supports ZIP only: {archive.name}")
+
+    wanted = {expected_filename.lower()}
+    if expected_filename.lower() == "libmediainfo.dll":
+        wanted.update({"mediainfo.dll", "libmediainfo.dll"})
+
+    with zipfile.ZipFile(archive) as package:
+        members = [
+            member for member in package.infolist()
+            if not member.is_dir() and Path(member.filename).name.lower() in wanted
+        ]
+        if not members:
+            raise RuntimeError(f"{expected_filename} was not found in {archive.name}")
+        member = members[0]
+        with package.open(member) as source, destination.open("wb") as output:
+            shutil.copyfileobj(source, output, length=1024 * 1024)
+    return destination
+
+
+def download_locked_tool(name, expected, source_root, target):
+    if sys.platform != "win32":
+        return None
+    url = expected.get("source")
+    if not url or not url.lower().split("?", 1)[0].endswith(".zip"):
+        return None
+
+    archive_name = Path(urllib.parse.urlparse(url).path).name
+    archive = source_root / "archives" / archive_name
+    download_archive(url, archive)
+    staged = source_root / expected["filename"]
+    extract_windows_tool(archive, expected["filename"], staged)
+    if file_hash(staged) != expected["sha256"]:
+        staged.unlink(missing_ok=True)
+        raise RuntimeError(f"Downloaded {name} does not match the locked SHA256")
+    return staged
 
 
 def cache_dir() -> Path:
@@ -82,6 +148,14 @@ def main() -> int:
             if file_hash(candidate) == expected["sha256"]:
                 source = candidate
                 break
+
+        if source is None:
+            try:
+                source = download_locked_tool(name, expected, source_root, args.target)
+            except Exception as error:
+                print(f"DOWNLOAD FAILED {name}: {error}")
+                failed = True
+                continue
 
         if source is None:
             existing = next((path for path in candidates if path.is_file()), None)

@@ -59,7 +59,14 @@ function getTvbConfigPath() {
 }
 
 function getDataDir() {
-  return app.getPath('userData');
+  if (process.env.TVB_DATA_DIR) return process.env.TVB_DATA_DIR;
+  const home = app.getPath('home');
+  const candidates = [
+    path.join(home, 'SynologyDrive', 'SharedRepoDocuments', 'tvb'),
+    path.join(home, 'Synology Drive', 'SharedRepoDocuments', 'tvb'),
+  ];
+  const shared = candidates.find((candidate) => fs.existsSync(candidate));
+  return shared || app.getPath('userData');
 }
 
 function stopPythonProcess() {

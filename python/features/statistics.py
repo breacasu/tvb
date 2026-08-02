@@ -4,12 +4,13 @@ import logging
 import os
 from datetime import datetime
 
+from data_paths import resolve_data_dir
+
 STATS_FILENAME = 'tvb-stats.csv'
 
 
 def _stats_path():
-    data_dir = os.environ.get('TVB_DATA_DIR')
-    return os.path.join(data_dir, STATS_FILENAME) if data_dir else STATS_FILENAME
+    return str(resolve_data_dir() / STATS_FILENAME)
 
 
 class Filesize:

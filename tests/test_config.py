@@ -38,6 +38,14 @@ class TestFormatConfigDefaults(unittest.TestCase):
         )
         self.assertEqual(config.get_format_params("movie"), "--mode hevc --quality 24")
 
+    def test_last_duplicate_parameter_wins(self):
+        config = self.make_config(
+            "[movie]\n"
+            "parameter = --mode hevc --quality 24\n"
+            "parameter = --mode hevc --quality 19\n"
+        )
+        self.assertEqual(config.get_format_params("movie"), "--mode hevc --quality 19")
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

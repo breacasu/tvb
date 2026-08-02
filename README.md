@@ -118,6 +118,18 @@ parameter = --mode hevc --quality 24 --add-audio all --add-subtitle all
 Statistics use ISO-8601 timestamps. The old locale setting is no longer
 needed and is ignored.
 
+Runtime statistics and logs are shared automatically when this directory
+exists on the current computer:
+
+```text
+~/SynologyDrive/SharedRepoDocuments/tvb
+```
+
+On Windows this normally resolves to
+`%USERPROFILE%\SynologyDrive\SharedRepoDocuments\tvb`. Set `TVB_DATA_DIR`
+to override the location. If the shared directory is unavailable, tvb falls
+back to the local application data directory.
+
 ## Build and Distribution
 
 ```bash
