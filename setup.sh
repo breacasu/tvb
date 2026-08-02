@@ -3,8 +3,10 @@ set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BIN_DIR="$SCRIPT_DIR/bin"
+OS=$(uname -s)
 ARCH=$(uname -m)
 PLATFORM="macos"
+[ "$OS" = "Linux" ] && PLATFORM="linux"
 [ "$ARCH" = "arm64" ] && ARCH_LABEL="arm64" || ARCH_LABEL="x86_64"
 
 echo "=== TVB Binary Setup ==="
@@ -13,6 +15,8 @@ echo ""
 
 mkdir -p "$BIN_DIR"
 
+if [ "$OS" = "Darwin" ]; then
+
 # --- HandBrakeCLI ---
 HBCLI="$BIN_DIR/HandBrakeCLI"
 if [ -f "$HBCLI" ]; then
@@ -20,12 +24,8 @@ if [ -f "$HBCLI" ]; then
 elif command -v HandBrakeCLI &>/dev/null; then
     echo "[OK] HandBrakeCLI found in PATH: $(command -v HandBrakeCLI)"
 else
-    HANDBRAKE_VERSION="1.9.2"
-    if [ "$ARCH" = "arm64" ]; then
-        HANDBRAKE_URL="https://github.com/HandBrake/HandBrake/releases/download/${HANDBRAKE_VERSION}/HandBrakeCLI-${HANDBRAKE_VERSION}-arm64.dmg"
-    else
-        HANDBRAKE_URL="https://github.com/HandBrake/HandBrake/releases/download/${HANDBRAKE_VERSION}/HandBrakeCLI-${HANDBRAKE_VERSION}-x86_64.dmg"
-    fi
+    HANDBRAKE_VERSION="1.11.2"
+    HANDBRAKE_URL="https://github.com/HandBrake/HandBrake/releases/download/${HANDBRAKE_VERSION}/HandBrakeCLI-${HANDBRAKE_VERSION}.dmg"
     echo "Downloading HandBrakeCLI ${HANDBRAKE_VERSION}..."
     DMG="HandBrakeCLI.dmg"
     curl -L --fail -o "$DMG" "$HANDBRAKE_URL"
@@ -43,6 +43,16 @@ if [ -f "$FFPROBE" ]; then
     echo "[OK] ffprobe already exists at $FFPROBE"
 elif command -v ffprobe &>/dev/null; then
     echo "[OK] ffprobe found in PATH: $(command -v ffprobe)"
+elif [ "$OS" = "Darwin" ] && command -v brew &>/dev/null; then
+    brew install ffmpeg 2>/dev/null || true
+    if command -v ffprobe &>/dev/null; then
+        echo "[OK] ffprobe installed through Homebrew: $(command -v ffprobe)"
+    else
+        echo "[WARN] Homebrew ffmpeg installation did not provide ffprobe"
+    fi
+elif [ "$OS" = "Darwin" ] && [ "$ARCH" = "arm64" ]; then
+    echo "[ERROR] Native arm64 ffprobe requires Homebrew: brew install ffmpeg"
+    exit 1
 else
     echo "Downloading ffprobe (static build)..."
     FFMPEG_URL="https://evermeet.cx/ffmpeg/getrelease/ffprobe/zip"
@@ -81,13 +91,13 @@ else
 
     # Fallback: download from MediaArea if not found via brew
     if [ ! -f "$LIBMI" ]; then
-        echo "Downloading libmediainfo.dylib from MediaArea..."
-        MEDIAINFO_VERSION="24.06"
         if [ "$ARCH" = "arm64" ]; then
-            LIBMI_URL="https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Mac_x64_WithoutInstaller.tar.bz2"
-        else
-            LIBMI_URL="https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Mac_x64_WithoutInstaller.tar.bz2"
+            echo "[ERROR] Native arm64 MediaInfo requires Homebrew: brew install libmediainfo"
+            exit 1
         fi
+        echo "Downloading libmediainfo.dylib from MediaArea..."
+        MEDIAINFO_VERSION="26.05"
+        LIBMI_URL="https://mediaarea.net/download/binary/libmediainfo0/${MEDIAINFO_VERSION}/MediaInfo_DLL_${MEDIAINFO_VERSION}_Mac_x86_64+arm64.tar.bz2"
         TARBALL="libmediainfo.tar.bz2"
         curl -L --fail -o "$TARBALL" "$LIBMI_URL" || {
             echo "[WARN] Download failed. Install manually: brew install libmediainfo"
@@ -102,9 +112,14 @@ else
                 echo "[OK] libmediainfo.dylib downloaded to $LIBMI"
             else
                 echo "[WARN] Could not extract libmediainfo.dylib from download"
-            fi
-        fi
     fi
+    fi
+fi
+fi
+
+else
+    echo "[WARN] Linux HandBrakeCLI is distributed by HandBrake only in a Flatpak bundle."
+    echo "       Prepare the standalone Linux runtime before running stage_tools.py."
 fi
 
 # --- Python dependencies ---

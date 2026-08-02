@@ -60,8 +60,9 @@ The exact mount path may differ on macOS.
 
 ## Immediate Mac Work
 
-The tool manifest is complete only for `win32-x64`.
-`tools.lock.json` currently marks `darwin-universal` and `linux-x64` as pending.
+The macOS arm64 tool manifest is now populated for the current Apple Silicon
+target. `linux-x64` and `linux-arm64` remain pending because HandBrake only
+publishes a Linux Flatpak bundle, not a standalone CLI runtime.
 
 Complete the macOS target first:
 
@@ -75,6 +76,9 @@ Complete the macOS target first:
 8. Run unit tests and a real 30-second Atmos and PGS preview.
 9. Run `npm run build` and `npm run dist` on macOS.
 10. Test the installed `.dmg`/application, not only the development start.
+
+The steps above were completed on macOS 26.5 arm64. See `STATUS.md` for the
+validated tool versions, previews and remaining signing/Intel follow-up.
 
 Expected macOS runtime tools:
 
@@ -105,8 +109,8 @@ does not mean the current HEVC preset; it means the original Lisa defaults.
 Run at least:
 
 ```bash
-python3 -m unittest discover tests -v
-python3 scripts/verify_tools.py
+.venv/bin/python -m unittest discover tests -v
+.venv/bin/python scripts/verify_tools.py
 npm run build:react
 npm run build
 npm run dist

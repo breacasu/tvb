@@ -215,7 +215,8 @@ def set_target_date(source, target):
 
 def split_command(command):
     """Parse a display command without treating Windows backslashes as escapes."""
-    if os.name != 'nt':
+    has_windows_path = re.search(r'(?<!\S)(?:[A-Za-z]:\\|\\\\)', command)
+    if os.name != 'nt' and not has_windows_path:
         return shlex.split(command)
 
     args = shlex.split(command, posix=False)

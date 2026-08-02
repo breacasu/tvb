@@ -18,7 +18,9 @@ def platform_key():
     if sys.platform == "win32":
         return "win32-arm64" if "ARM64" in os.environ.get("PROCESSOR_ARCHITECTURE", "") else "win32-x64"
     if sys.platform == "darwin":
-        return "darwin-universal"
+        return "darwin-arm64" if platform.machine() == "arm64" else "darwin-x64"
+    if sys.platform == "linux":
+        return "linux-arm64" if platform.machine() in {"aarch64", "arm64"} else "linux-x64"
     return "linux-x64"
 
 

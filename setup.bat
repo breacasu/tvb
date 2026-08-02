@@ -28,8 +28,13 @@ if !ERRORLEVEL! equ 0 (
     goto :hb_done
 )
 
-set "HANDBRAKE_VERSION=1.9.2"
-set "HANDBRAKE_URL=https://github.com/HandBrake/HandBrake/releases/download/!HANDBRAKE_VERSION!/HandBrakeCLI-!HANDBRAKE_VERSION!-win-x86_64.zip"
+set "HANDBRAKE_VERSION=1.11.2"
+if /I "%PROCESSOR_ARCHITECTURE%"=="ARM64" (
+    set "HANDBRAKE_ARCH=aarch64"
+) else (
+    set "HANDBRAKE_ARCH=x86_64"
+)
+set "HANDBRAKE_URL=https://github.com/HandBrake/HandBrake/releases/download/!HANDBRAKE_VERSION!/HandBrakeCLI-!HANDBRAKE_VERSION!-win-!HANDBRAKE_ARCH!.zip"
 echo Downloading HandBrakeCLI !HANDBRAKE_VERSION!...
 curl -L --fail -o hbcli.zip "!HANDBRAKE_URL!"
 if !ERRORLEVEL! neq 0 (
@@ -62,7 +67,11 @@ if !ERRORLEVEL! equ 0 (
     goto :ff_done
 )
 
-set "FFMPEG_URL=https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+if /I "%PROCESSOR_ARCHITECTURE%"=="ARM64" (
+    set "FFMPEG_URL=https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-winarm64-gpl.zip"
+) else (
+    set "FFMPEG_URL=https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
+)
 echo Downloading ffprobe (ffmpeg essentials)...
 curl -L --fail -o ffmpeg.zip "!FFMPEG_URL!"
 if !ERRORLEVEL! neq 0 (
@@ -98,8 +107,13 @@ if exist "%C_BIN_DIR%\libmediainfo.dll" (
     goto :libmi_done
 )
 
-set "MEDIAINFO_VERSION=24.06"
-set "LIBMI_URL=https://mediaarea.net/download/binary/libmediainfo0/!MEDIAINFO_VERSION!/MediaInfo_DLL_!MEDIAINFO_VERSION!_Windows_x64_WithoutInstaller.zip"
+set "MEDIAINFO_VERSION=26.05"
+if /I "%PROCESSOR_ARCHITECTURE%"=="ARM64" (
+    set "MEDIAINFO_ARCH=ARM64"
+) else (
+    set "MEDIAINFO_ARCH=x64"
+)
+set "LIBMI_URL=https://mediaarea.net/download/binary/libmediainfo0/!MEDIAINFO_VERSION!/MediaInfo_DLL_!MEDIAINFO_VERSION!_Windows_!MEDIAINFO_ARCH!_WithoutInstaller.zip"
 echo Downloading libmediainfo.dll !MEDIAINFO_VERSION!...
 curl -L --fail -o libmi.zip "!LIBMI_URL!"
 if !ERRORLEVEL! neq 0 (

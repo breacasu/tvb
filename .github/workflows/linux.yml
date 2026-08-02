@@ -1,0 +1,90 @@
+name: Linux CI
+
+on:
+  push:
+    branches: [dev]
+  pull_request:
+    branches: [dev]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: linux-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  unit-and-react:
+    name: Unit tests and React build
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: requirements.txt
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Create project virtual environment
+        run: python -m venv .venv
+
+      - name: Install Python dependencies
+        run: |
+          .venv/bin/python -m pip install --upgrade pip
+          .venv/bin/python -m pip install -r requirements.txt
+
+      - name: Install Node dependencies
+        run: npm ci
+
+      - name: Run Python unit tests
+        run: .venv/bin/python -m unittest discover tests -v
+
+      - name: Build React frontend
+        run: npm run build:react
+
+      - name: Report Linux bundle status
+        run: |
+          .venv/bin/python - <<'PY'
+          import json
+          from pathlib import Path
+
+          manifest = json.loads(Path("tools.lock.json").read_text(encoding="utf-8"))
+          for platform in ("linux-x64", "linux-arm64"):
+              status = manifest["platforms"][platform].get("status")
+              if status != "pending_handbrake_standalone_artifact":
+                  raise SystemExit(f"Unexpected {platform} manifest status: {status}")
+              print(f"{platform}: {status}")
+          PY
+
+  upstream-tools:
+    name: Linux upstream tool smoke test
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Linux tool clients
+        run: |
+          sudo apt-get update
+          sudo apt-get install --yes flatpak ffmpeg libmediainfo0v5
+
+      - name: Install current HandBrake Flatpak
+        run: |
+          flatpak --user remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+          flatpak --user install --noninteractive flathub fr.handbrake.ghb
+
+      - name: Check HandBrakeCLI
+        run: flatpak --user run --command=HandBrakeCLI fr.handbrake.ghb --version
+
+      - name: Check ffprobe
+        run: ffprobe -version
+
+      - name: Check MediaInfo library
+        run: ldconfig -p | grep -E 'libmediainfo\.so'

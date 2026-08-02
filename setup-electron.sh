@@ -2,7 +2,7 @@
 # Setup Electron for TVB — installs to ~/.local/electron
 set -e
 
-ELECTRON_VERSION="42.2.0"
+ELECTRON_VERSION="43.2.0"
 ELECTRON_DIR="$HOME/.local/electron"
 ARCH=$(uname -m)
 OS=$(uname -s)
@@ -28,15 +28,19 @@ esac
 
 echo "Setting up Electron v${ELECTRON_VERSION} for ${ARCH_NAME}..."
 
-# Install npm package without binary
 mkdir -p "$ELECTRON_DIR"
 cd "$ELECTRON_DIR"
 npm init -y --silent 2>/dev/null || true
-ELECTRON_SKIP_BINARY_DOWNLOAD=1 npm install electron@${ELECTRON_VERSION} --save-dev --silent 2>/dev/null
 
-# Download and extract Electron binary
+CURRENT_ELECTRON_VERSION=""
+if [ -x "$ELECTRON_BINARY" ]; then
+  CURRENT_ELECTRON_VERSION=$("$ELECTRON_BINARY" --version 2>/dev/null || true)
+fi
+
 ZIP="electron-v${ELECTRON_VERSION}-${ARCH_NAME}.zip"
-if [ ! -f "$ELECTRON_BINARY" ]; then
+if [ "$CURRENT_ELECTRON_VERSION" != "v${ELECTRON_VERSION}" ]; then
+  rm -rf node_modules/electron
+  ELECTRON_SKIP_BINARY_DOWNLOAD=1 npm install electron@${ELECTRON_VERSION} --save-dev --silent 2>/dev/null
   echo "Downloading Electron binary..."
   curl -L --fail -o "$ZIP" "https://github.com/electron/electron/releases/download/v${ELECTRON_VERSION}/${ZIP}"
   unzip -q -o "$ZIP" -d node_modules/electron/dist

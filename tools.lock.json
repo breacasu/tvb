@@ -5,28 +5,70 @@
     "win32-x64": {
       "HandBrakeCLI": {
         "filename": "HandBrakeCLI.exe",
-        "version": "1.10.2",
-        "sha256": "6692D82F1C773F41CA60D08FF3FC87D0D9CD32D38FDD9688799FBEDAF54C8919",
-        "source": "https://handbrake.fr/downloads2.php"
+        "version": "1.11.2",
+        "sha256": "9664C09DD5C5B5A52FD6E2849366B3C86C221B4F63BD8EACEC73A3C95BB647EC",
+        "source": "https://github.com/HandBrake/HandBrake/releases/download/1.11.2/HandBrakeCLI-1.11.2-win-x86_64.zip"
       },
       "ffprobe": {
         "filename": "ffprobe.exe",
-        "version": "8.1.1",
-        "sha256": "0FDE260F5ABD35C9CAFD96F594CC76365A780C1B73A90E35B6A3409EA1DB1BF0",
-        "source": "https://www.gyan.dev/ffmpeg/builds/"
+        "version": "8.1.2",
+        "sha256": "B49CCC7C6547B141AD5A2F6EC69CC04323D7133D7704D70B331B904C63EECB07",
+        "source": "https://www.gyan.dev/ffmpeg/builds/ffmpeg-release-essentials.zip"
       },
       "libmediainfo": {
         "filename": "libmediainfo.dll",
-        "version": "21.09",
-        "sha256": "F59EDCA0266E70FF357E574AC48B43C3F809F804AF11339BFAAD394D2BCC4E26",
-        "source": "https://mediaarea.net/en/MediaInfo/Download/Windows"
+        "version": "26.05",
+        "sha256": "A2612FA8BF639349AEE9747D8A555D361F5DB95B049B3AF9B0C3851A21A4308D",
+        "source": "https://mediaarea.net/download/binary/libmediainfo0/26.05/MediaInfo_DLL_26.05_Windows_x64_WithoutInstaller.zip"
       }
     },
-    "darwin-universal": {
-      "status": "pending_platform_artifacts"
+    "win32-arm64": {
+      "HandBrakeCLI": {
+        "filename": "HandBrakeCLI.exe",
+        "version": "1.11.2",
+        "sha256": "BEBAA3421AD16C6397825D37573D31C89D28C24B810634916DD1A272EA8B3ADE",
+        "source": "https://github.com/HandBrake/HandBrake/releases/download/1.11.2/HandBrakeCLI-1.11.2-win-aarch64.zip"
+      },
+      "ffprobe": {
+        "filename": "ffprobe.exe",
+        "version": "N-125907-ga7e72069f1-20260802",
+        "sha256": "75CDF0A729E7CCC2585B8DCF1D9AB9DDAC214AF6E2BB4D391D6D0BBFADCF6639",
+        "source": "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-winarm64-gpl.zip"
+      },
+      "libmediainfo": {
+        "filename": "libmediainfo.dll",
+        "version": "26.05",
+        "sha256": "A45EBEB3DE695504E2B2DF32A0A8D066D717510AD07D00A1BE700B31A2B0E2E6",
+        "source": "https://mediaarea.net/download/binary/libmediainfo0/26.05/MediaInfo_DLL_26.05_Windows_ARM64_WithoutInstaller.zip"
+      }
+    },
+    "darwin-arm64": {
+      "HandBrakeCLI": {
+        "filename": "HandBrakeCLI",
+        "version": "1.11.2",
+        "sha256": "74F79497A96CD996032BAFC562A978F69AF9A94EC0C99E55ED9DE93596987D0B",
+        "source": "https://github.com/HandBrake/HandBrake/releases/download/1.11.2/HandBrakeCLI-1.11.2.dmg"
+      },
+      "ffprobe": {
+        "filename": "ffprobe",
+        "version": "8.1.2",
+        "sha256": "CFEEFCC9207EB3FA424679228FE3848DB2921B15537D26C1CCC4A7A61DE95D00",
+        "source": "https://formulae.brew.sh/formula/ffmpeg"
+      },
+      "libmediainfo": {
+        "filename": "libmediainfo.dylib",
+        "version": "26.05",
+        "sha256": "72AF169C7BF2D651F67749EBBCA744ADCB9BB104631467B7D1CE6C2688095218",
+        "source": "https://formulae.brew.sh/formula/libmediainfo"
+      }
     },
     "linux-x64": {
-      "status": "pending_platform_artifacts"
+      "status": "pending_handbrake_standalone_artifact",
+      "note": "HandBrake 1.11.2 publishes Linux CLI only inside a Flatpak bundle; a standalone, license-compliant runtime extraction or reproducible source build is still required."
+    },
+    "linux-arm64": {
+      "status": "pending_handbrake_standalone_artifact",
+      "note": "HandBrake 1.11.2 publishes Linux CLI only inside a Flatpak bundle; a standalone, license-compliant runtime extraction or reproducible source build is still required."
     }
   }
 }

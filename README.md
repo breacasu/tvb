@@ -55,8 +55,8 @@ npm run start:win
 ```bash
 ./setup-electron.sh
 ./setup.sh
-python scripts/stage_tools.py
-python scripts/verify_tools.py
+.venv/bin/python scripts/stage_tools.py
+.venv/bin/python scripts/verify_tools.py
 npm install
 npm run build
 npm start
@@ -64,6 +64,9 @@ npm start
 
 `setup.sh` creates `.venv` and installs all Python build dependencies there.
 It does not install packages into the system Python.
+
+The Linux manifest remains pending until HandBrake provides a standalone CLI
+runtime or TVB has a reproducible, license-compliant Flatpak extraction/build.
 
 ## CLI
 

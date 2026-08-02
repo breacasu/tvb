@@ -3,7 +3,7 @@ setlocal EnableDelayedExpansion
 REM Setup Electron for TVB on Windows
 REM Installs Electron standalone in %USERPROFILE%\.local\electron
 
-set ELECTRON_VERSION=42.2.0
+set ELECTRON_VERSION=43.2.0
 set ELECTRON_DIR=%USERPROFILE%\.local\electron
 set ARCH=%PROCESSOR_ARCHITECTURE%
 if "%ARCH%"=="AMD64" set ARCH_NAME=win32-x64
@@ -15,7 +15,13 @@ if not exist "%ELECTRON_DIR%" mkdir "%ELECTRON_DIR%"
 cd /d "%ELECTRON_DIR%"
 
 set "ZIP=electron-v%ELECTRON_VERSION%-%ARCH_NAME%.zip"
-if not exist "node_modules\electron\dist\electron.exe" (
+set "ELECTRON_BINARY=%ELECTRON_DIR%\node_modules\electron\dist\electron.exe"
+set "ELECTRON_OK=0"
+if exist "%ELECTRON_BINARY%" (
+    for /f "delims=" %%V in ('"%ELECTRON_BINARY%" --version 2^>nul') do if "%%V"=="v%ELECTRON_VERSION%" set "ELECTRON_OK=1"
+)
+if "%ELECTRON_OK%"=="0" (
+    if exist "node_modules\electron" rmdir /s /q "node_modules\electron"
     echo Installing Electron package...
     call npm init -y >nul 2>&1
     set ELECTRON_SKIP_BINARY_DOWNLOAD=1

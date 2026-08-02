@@ -38,9 +38,8 @@ checksums, build on the native target runner and publish only the finished
 installer as a GitHub Release asset. A clean runner must never use tools from
 its global `PATH`.
 
-The current Windows manifest is populated from the verified local tool set.
-macOS and Linux entries still need platform-specific artifacts. Linux is the
-most involved target because HandBrake currently distributes its Linux CLI
-through Flatpak rather than a simple standalone archive; the release build
-will need a reproducible source build or an extracted, license-compliant
- runtime bundle.
+The Windows x64/ARM64 and macOS arm64 manifests are populated from verified
+platform artifacts. Linux is still the most involved target because HandBrake
+currently distributes its Linux CLI through Flatpak rather than a simple
+standalone archive; the release build needs a reproducible source build or an
+extracted, license-compliant runtime bundle.

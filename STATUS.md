@@ -39,13 +39,26 @@ Stand: 2026-08-02
 - 12 HDMV/PGS cases retain PGS subtitles in their outputs
 - No invalid MKV output was produced by the matrix
 
+## Verified on macOS
+
+- Apple Silicon arm64 build from a local checkout on macOS 26.5
+- Bundled HandBrakeCLI 1.11.2, ffprobe 8.1.2 and MediaInfoLib 26.05
+- 29 Python unit tests pass with the project-local Python 3.14 environment
+- Real 30-second Atmos and HDMV/PGS previews pass ffprobe validation
+- PyInstaller onefile runs with `TVB_BUNDLED_ONLY=1` and loads the MediaInfo fallback
+- Electron arm64 `.app`, ZIP and DMG builds complete successfully
+- The packaged application and mounted DMG load the production GUI
+- Linux GitHub Actions workflow added for Ubuntu unit/React and upstream-tool checks
+
 ## Still Open
 
 - Move the current project into the canonical `breacasu/tvb` repository
-- Complete macOS and Linux tool manifests
+- Validate a universal Intel/Apple Silicon macOS artifact separately; the current Mac build is arm64
+- Obtain a valid Developer ID certificate for signed and notarized macOS releases
+- Complete Linux HandBrake standalone runtime; upstream currently publishes only a Flatpak bundle
 - Reproducible CI downloads for all supported platforms
 - Linux HandBrakeCLI bundle strategy
-- Native macOS/Linux builds and installers
+- Native Linux build and installer; macOS arm64 build is validated locally
 - Complete third-party license collection in release assets
 - Full regression matrix over all non-subtitle encoding presets and test files
 - Final parity review against the old CLI and `transcode-video.rb`
