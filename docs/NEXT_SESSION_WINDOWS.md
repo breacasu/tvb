@@ -6,7 +6,7 @@ This document is for the next validation session on Windows.
 
 - Repository: `https://github.com/breacasu/tvb`
 - Branch: `dev`
-- Current commit: `d74d406 Mark Linux unsupported`
+- Current commit: `6e75701 Add Windows validation handoff`
 - Do not work on or push to `main`.
 - Use a local Windows checkout. Do not use the NAS as the Git worktree.
 

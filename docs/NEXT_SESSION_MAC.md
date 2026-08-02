@@ -6,7 +6,7 @@ This document is the handoff for the next coding session on macOS.
 
 - Repository: `https://github.com/breacasu/tvb`
 - Branch: `dev`
-- Current commit: `c8113e2 Use Lisa defaults for empty presets`
+- Current commit: `6e75701 Add Windows validation handoff`
 - Do not work on or push to `main`.
 - The old local folders `tvb-electron` and the previous non-git `tvb` copy are not the source of truth anymore.
 
